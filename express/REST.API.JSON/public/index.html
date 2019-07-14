@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Список пользователей</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+</head>
+
+<body>
+    <h2>Список пользователей</h2>
+    <form name="userForm">
+        <input type="hidden" name="id" value="0" />
+        <div class="form-group">
+            <label for="name">Имя:</label>
+            <input class="form-control" name="name" />
+        </div>
+        <div class="form-group">
+            <label for="age">Возраст:</label>
+            <input class="form-control" name="age" />
+        </div>
+        <div class="panel-body">
+            <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
+            <a id="reset" class="btn btn-sm btn-primary">Сбросить</a>
+        </div>
+    </form>
+    <table class="table table-condensed table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Имя</th>
+                <th>возраст</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        // асинхронный HTTP (Ajax) запрос
+        // .ajax( settings )
+        // settings -> Тип: Объект
+        // Набор параметров вида ключ: значение, которые настраивают запрос Ajax. Все настройки опциональны. По умолчанию настройки берутся из $.ajaxSetup().
+        // Получение всех пользователей
+        function GetUsers() {
+            $.ajax({
+                url: "api/users", // Путь, накоторую будет отправлен запрос.
+                type: "GET", // Определяет тип запроса GET или POST. Можно также использовать другие HTTP-запросы (такие как PUT или DELETE)
+                contentType: "application/json", // При отправке Ajax запроса, данные передаются в том виде, в котором указаны в данном параметре. По умолчанию используется 'application/x-www-form-urlencoded; charset=UTF-8'. Если задать значение самим, то оно будет отправлено на сервер. Если кодировка не указана, то по умолчанию будет использоваться кодировка выставленная на сервере.
+                success: function (users) { // передаётся массив из объектов js, пришедших с сервера из файла users.json
+                    var rows = "";
+                    $.each(users, function (index, user) {
+                        // добавляем полученные элементы в таблицу
+                        rows += row(user); // это функция прописана ниже!!!
+                        // Для добавления строк в таблицу используется функция row(), которая возвращает строку. В этой строке будут определены ссылки для изменения и удаления пользователя.
+                    })
+                    $("table tbody").append(rows); // Метод append добавляет элемент в конец элемента выборки.
+                }
+                // success(объект data, строка textStatus, объект jqXHR)
+                // Функция, которая будет вызвана в случае успешного завершения запроса. Принимает 3 аргумента - данные(data), присланные сервером и прошедшие предварительную обработку; строка со статусом выполнения(textStatus); объект jqXHR(в версиях до 1.5 вместо jqXHR используется XMLHttpRequest).С версии jQuery 1.5, вместо одной функции, этот параметр может принимать массив функций.
+            });
+        }
+        // Получение одного пользователя
+        function GetUser(id) {
+            $.ajax({
+                url: "/api/users/" + id,
+                type: "GET",
+                contentType: "application/json",
+                success: function (user) {
+                    var form = document.forms["userForm"];
+                    form.elements["id"].value = user.id; // у формы обращается к элементу где есть name="id" и вписывает значение 
+                    form.elements["name"].value = user.name;
+                    form.elements["age"].value = user.age;
+                }
+            });
+        }
+        // Добавление пользователя
+        function CreateUser(userName, userAge) { // Вася, 54
+            $.ajax({
+                url: "api/users",
+                contentType: "application/json",
+                method: "POST", // в app.js в методе app.post() прописано добавление нового id для нового пользователя
+                data: JSON.stringify({ // отправляется json формат
+                    name: userName,
+                    age: userAge
+                }),
+                // Данные, которые будут переданы на сервер. Если данные не являются строкой, то они конвертируются в строку запроса. Для запросов типа GET данные прикрепляются к URL. Объект должен состоять из пар ключ/значение. Если в значении массив, то jQuery упорядочивает значения в зависимости от настройки traditional. По умолчанию, например, {foo:["bar1", "bar2"]} превращается в &foo=bar1&foo=bar2.
+                success: function (user) { 
+                    reset(); // после оправки данных очищяет поля у формы. ф-ция прописана ниже
+                    $("table tbody").append(row(user));
+                }
+            })
+        }
+        // Изменение пользователя
+        function EditUser(userId, userName, userAge) {
+            $.ajax({
+                url: "api/users",
+                contentType: "application/json",
+                method: "PUT",
+                data: JSON.stringify({
+                    id: userId,
+                    name: userName,
+                    age: userAge
+                }),
+                success: function (user) {
+                    reset(); // при изменении очистятся поля формы
+                    $("tr[data-rowid='" + user.id + "']").replaceWith(row(user)); // replaceWith() - заменяет выбранные элементы на новые указанные в (). () может быть HTML-строкой, DOM-элементом, jQuery-объектом
+                }
+            })
+        }
+
+        // сброс формы
+        function reset() {
+            var form = document.forms["userForm"];
+            form.reset();
+            form.elements["id"].value = 0;
+        }
+
+        // Удаление пользователя
+        function DeleteUser(id) {
+            $.ajax({
+                url: "api/users/" + id,
+                contentType: "application/json",
+                method: "DELETE",
+                success: function (user) {
+                    console.log(user);
+                    $("tr[data-rowid='" + user.id + "']").remove(); // .remove() - удаляет все выбранные элементы из DOM (указанный элемент и всех его потомков)
+                }
+            })
+        }
+        // создание строки для таблицы
+        var row = function (user) {
+            return "<tr data-rowid='" + user.id + "'><td>" + user.id + "</td>" +
+                "<td>" + user.name + "</td> <td>" + user.age + "</td>" +
+                "<td><a class='editLink' data-id='" + user.id + "'>Изменить</a> | " +
+                "<a class='removeLink' data-id='" + user.id + "'>Удалить</a></td></tr>";
+        }
+        // сброс значений формы
+        $("#reset").click(function (e) {
+            e.preventDefault();
+            reset();
+        })
+
+        // отправка формы
+        $("form").submit(function (e) {
+            e.preventDefault();
+            var id = this.elements["id"].value; // у формы считывается значение из поля
+            var name = this.elements["name"].value;
+            var age = this.elements["age"].value;
+            if (id == 0)
+                CreateUser(name, age);
+            else
+                EditUser(id, name, age);
+        });
+
+        // нажимаем на ссылку Изменить
+        $("body").on("click", ".editLink", function () { // вешает обработчик для каждой ссылки .editLink
+            var id = $(this).data("id"); // this - содержит a.editLink и считывает номер id из аттрибута data-id
+            GetUser(id);
+        })
+        // нажимаем на ссылку Удалить
+        $("body").on("click", ".removeLink", function () {
+            var id = $(this).data("id");
+            DeleteUser(id);
+        })
+
+        // загрузка пользователей
+        GetUsers();
+
+    </script>
+</body>
+
+</html>

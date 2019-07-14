@@ -1,0 +1,24 @@
+// const fs = require("fs");
+ 
+// fs.writeFile("hello.txt", "Hello мир!", function(error){
+//     if(error) throw error; 
+//     console.log("Асинхронная запись файла завершена. Содержимое файла:");
+//     const data = fs.readFileSync("hello.txt", "utf8");
+//     console.log(data);  // выводим считанные данные
+// });
+
+// // fs.writeFile() - перезапишет содержимое файла
+// -----------------------------------------------------------------------------------------------------
+const fs = require("fs");
+ 
+fs.appendFileSync("hello.txt", "Привет ми ми ми!");
+ 
+fs.appendFile("hello.txt", "Привет МИД!", function(error){
+    if(error) throw error;
+                 
+    console.log("Запись файла завершена. Содержимое файла:");
+    let data = fs.readFileSync("hello.txt", "utf8");
+    console.log(data);
+});
+
+// fs.appendFile()/fs.appendFileSync() - добавляют информацию в файл

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Регистрация</title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <h1>Введите данные</h1>
+    <form name="registerForm">
+        <label>Имя</label></br>
+        <input type="text" name="userName" /></br></br>
+        <label>Возраст</label></br>
+        <input type="number" name="userAge" /></br></br>
+        <button type="submit" id="submit">Отправить</button>
+    </form>
+    <script>
+        document.getElementById("submit").addEventListener("click", function (e) {
+            e.preventDefault(); // с помощью метода preventDefault() объекта Event мы можем остановить дальнейшее выполнение события
+            // получаем данные формы
+            let registerForm = document.forms["registerForm"];
+            let userName = registerForm.elements["userName"].value;
+            let userAge = registerForm.elements["userAge"].value;
+            // сериализуем данные в json
+            let user = JSON.stringify({
+                userName: userName,
+                userAge: userAge
+            });
+            let request = new XMLHttpRequest(); // Ajax
+            // посылаем запрос на адрес "/user"
+            request.open("POST", "/user", true);
+            request.setRequestHeader("Content-Type", "application/json");
+            request.addEventListener("load", function () {
+                console.log(request.response); // смотрим ответ сервера(что вернёт app.js, метод response.json()). Console Chrome: "Ax1S - 25"
+            });
+            request.send(user);
+        });
+        // После создания объекта XMLHttpRequest можно отправлять запросы к серверу. Но для начала надо вызвать метод open() для инициализации
+        // Метод open() принимает три параметра: тип запроса (GET, POST, HEAD, PUT), адрес запроса и третий необязательный параметр - логическое значение true или false, указывающее, будет ли запрос осуществляться в асинхронном режиме.
+        // По умолчанию, если третий параметр не используется, то запрос отправляется в асинхронном режиме, что позволяет параллельно с выполнением запроса выполнять также и другой код javascript.
+        // Кроме того, метод open() может принимать еще два параметра: логин и пароль пользователя, если для выполнения запроса нужна аутентификация.
+        // После инициализации запроса методом open() необходимо отправить запрос с помощью метода send()
+        // Для отправки данных методом POST надо установить заголовок Content-Type с помощью метода setRequestHeader()
+    </script>
+</body>
+<html>

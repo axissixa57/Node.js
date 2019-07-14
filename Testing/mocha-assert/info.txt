@@ -1,0 +1,32 @@
+npm install mocha --save-dev
+
+Для упрощения запуска тестов изменим файл package.json следующим образом:
+"scripts":{
+"test" : "mocha *.test.js"
+}
+Здесь добавляется секция "scripts", в которой определяется команда "test". Эта команда выполняет команду "mocha *.test.js", которая запускает тестирование с помощью mocha, передавая фреймворку все файлы, которые оканчиваются на ".test.js"
+Если у нас один файл теста, то мы могли бы сразу указать полное имя файла, типа mocha operations.test.js
+Далее в командной строке перейдем к папке проекта и выполним команду: npm test
+
+при успешном:
+> testapp@1.0.0 test F:\node\mocha
+> mocha *.test.js
+
+  √ should multiply two numbers
+
+  1 passing (7ms)
+
+при неуспешном:
+> testapp@1.0.0 test F:\node\mocha
+> mocha *.test.js
+
+  1) should multiply two numbers
+
+  0 passing (6ms)
+  1 failing
+
+  1) should multiply two numbers:
+     Error: Expected 16, but got 15
+      at Context.<anonymous> (operations.test.js:7:15)
+
+npm ERR! Test failed.  See above for more details.
