@@ -1,0 +1,31 @@
+﻿1. $ npx eslint --init - задать параметры установки, после создаётся файл .eslintrc.js.
+настройка eslint с помощью терминала(вопросов)
+
+2. eslint-config-airbnb: $ npx install-peerdeps --dev eslint-config-airbnb - установит:
+    "eslint-config-airbnb",
+    "eslint-plugin-import",
+    "eslint-plugin-jsx-a11y",
+    "eslint-plugin-react" 
+После нужно: Add "extends": "airbnb" to your .eslintrc
+
+3. npx eslint ./src/index.js - проверка на правильность
+npx eslint ./src/index.js --fix - исправление автоматом
+
+4. Ошибка: error    Expected linebreaks to be 'LF' but found 'CRLF'  linebreak-style 
+Fix в eslintrc.js: "rules": {
+        "linebreak-style": ["error", "windows"]
+    }
+
+5. Prettier - форматирует код автоматом
+npm install prettier --save-dev --save-exact (установка)
+npx prettier --write src/index.js (проверка)
+
+6. "scripts": {
+    "lint": "eslint ./src/**/*.js"
+  }, - ** означает что все js файлы
+
+7. airbnb - стиль написания кода
+   lint - указывает на ошибки
+   prettier - исправляет ошибки
+
+8. Если prettier не исправляет ошибки, например вместо "" должны быть '' нужно создать файл .prettierrc

@@ -6,7 +6,7 @@ const app = express();
 const urlencodedParser = express.urlencoded({ extended: false }); // bodyParser.urlencoded({ extended: false });
 
 // определяем объект Sequelize
-const sequelize = new Sequelize("usersdb", "root", "", {
+const sequelize = new Sequelize("usersdb", "root", "1234567", {
     dialect: "mysql",
     host: "localhost",
     define: {
